@@ -1,0 +1,30 @@
+---
+- name: Update Debian distribution and install htop and zram-tools packages
+  hosts: hp
+  become: true
+  become_method: sudo
+  vars_files:
+    - ./vars/secret.yml
+
+  tasks:
+  - name: Update Debian distribution
+    apt:
+      update_cache: yes
+      upgrade: dist
+
+  - name: Install htop and zram-tools packages
+    apt:
+      name:
+        - htop
+        - zram-tools
+      state: present
+
+  - name: zramswap setup
+    copy:
+      src: ./zramswap
+      dest: /etc/default/zramswap
+      mode: preserve
+  - name: Stop zramswap
+    command: "zramswap stop"
+  - name: Start zramswap
+    command: "zramswap start"
